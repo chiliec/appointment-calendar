@@ -10,11 +10,19 @@
     "url": "git+https://github.com/chiliec/appointment-calendar.git"
   },
   "homepage": "https://github.com/chiliec/appointment-calendar#readme",
-  "keywords": ["react", "calendar", "appointment", "scheduler", "timeline"],
+  "keywords": [
+    "react",
+    "calendar",
+    "appointment",
+    "scheduler",
+    "timeline"
+  ],
   "engines": {
     "node": ">=20"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -44,6 +52,7 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@eslint/js": "^10.0.1",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.1.0",
     "@types/node": "^20.17.10",
