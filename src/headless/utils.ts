@@ -8,24 +8,18 @@ export function formatYMD(d: Date): string {
 
 /**
  * Build a Monday-first month grid.
- * Returns YYYY-MM-DD strings from the Monday on/before the 1st through the
- * Sunday on/after the last day of the month.
+ * Always returns exactly 42 YYYY-MM-DD strings (6 weeks × 7 days) starting
+ * from the Monday on/before the 1st. Trailing days bleed into the next month.
  */
 export function buildMonthGrid(year: number, month: number): string[] {
   const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
-
   const startWeekday = (firstDay.getDay() + 6) % 7;
   const gridStart = new Date(firstDay);
   gridStart.setDate(gridStart.getDate() - startWeekday);
 
-  const endWeekday = (lastDay.getDay() + 6) % 7;
-  const gridEnd = new Date(lastDay);
-  gridEnd.setDate(gridEnd.getDate() + (6 - endWeekday));
-
   const days: string[] = [];
   const cursor = new Date(gridStart);
-  while (cursor <= gridEnd) {
+  for (let i = 0; i < 42; i++) {
     days.push(formatYMD(cursor));
     cursor.setDate(cursor.getDate() + 1);
   }

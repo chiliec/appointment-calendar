@@ -33,7 +33,9 @@ describe("buildMonthGrid", () => {
 
   it("includes bleed days from the next month when month ends mid-week", () => {
     const grid = buildMonthGrid(2026, 1); // February 2026 (28th = Saturday)
-    expect(grid[grid.length - 1]).toBe("2026-03-01");
+    // Grid is always 42 days; Feb 2026 starts Sunday so it bleeds into March
+    expect(grid).toContain("2026-03-01");
+    expect(grid[grid.length - 1]).toBe("2026-03-08");
   });
 
   it("handles leap year February", () => {
@@ -45,6 +47,17 @@ describe("buildMonthGrid", () => {
     const grid = buildMonthGrid(2026, 11); // December 2026
     expect(grid).toContain("2026-12-01");
     expect(grid).toContain("2026-12-31");
+  });
+});
+
+describe("buildMonthGrid length", () => {
+  it("always returns exactly 42 entries (6 weeks × 7 days)", () => {
+    // Various months that previously produced 28, 35, or 42 days
+    expect(buildMonthGrid(2027, 1)).toHaveLength(42); // Feb 2027, Mon→Sun, 28 days
+    expect(buildMonthGrid(2026, 1)).toHaveLength(42); // Feb 2026, Sun start, 28 days
+    expect(buildMonthGrid(2023, 9)).toHaveLength(42); // Oct 2023, 31 days
+    expect(buildMonthGrid(2026, 4)).toHaveLength(42); // May 2026
+    expect(buildMonthGrid(2026, 11)).toHaveLength(42); // Dec 2026
   });
 });
 
