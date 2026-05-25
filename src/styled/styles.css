@@ -1,1 +1,207 @@
-/* placeholder */
+/* @chiliec/appointment-calendar styles
+ * Class prefix: .ac- (consumers can override)
+ * Color tokens are CSS variables — override on a parent element to re-theme.
+ */
+
+:where(.ac-root) {
+  --ac-bg: #ffffff;
+  --ac-fg: #18181b;
+  --ac-muted: #71717a;
+  --ac-muted-2: #a1a1aa;
+  --ac-border: #e4e4e7;
+  --ac-border-strong: #d4d4d8;
+  --ac-surface: #fafafa;
+  --ac-selected-bg: #18181b;
+  --ac-selected-fg: #ffffff;
+  --ac-accent: #ef4444;
+  --ac-accent-bg: #fef2f2;
+  --ac-radius: 1.5rem;
+  --ac-radius-sm: 0.75rem;
+  --ac-shadow: 0 1px 2px rgb(0 0 0 / 0.05);
+  --ac-slot-height: 64px;
+
+  color: var(--ac-fg);
+  background: var(--ac-bg);
+  border: 1px solid var(--ac-border);
+  border-radius: var(--ac-radius);
+  padding: 1.5rem;
+  box-shadow: var(--ac-shadow);
+  font: inherit;
+}
+
+/* Month calendar */
+.ac-month-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.ac-month-nav-btn {
+  border: 1px solid var(--ac-border);
+  border-radius: var(--ac-radius-sm);
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  background: var(--ac-bg);
+  cursor: pointer;
+}
+.ac-month-nav-btn:hover { background: var(--ac-surface); }
+.ac-month-title {
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: capitalize;
+}
+.ac-today-btn {
+  display: block;
+  margin: 0 auto;
+  background: none;
+  border: 0;
+  font-size: 0.75rem;
+  color: var(--ac-muted-2);
+  cursor: pointer;
+}
+.ac-today-btn:hover { color: var(--ac-fg); }
+
+.ac-weekday-row,
+.ac-day-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  margin-top: 1rem;
+}
+.ac-weekday {
+  font-size: 10px;
+  text-transform: uppercase;
+  font-weight: 500;
+  color: var(--ac-muted-2);
+  text-align: center;
+  padding: 0.25rem 0;
+}
+.ac-day-cell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  height: 36px;
+  border-radius: var(--ac-radius-sm);
+  padding: 0.25rem 0;
+  font-size: 0.75rem;
+  background: none;
+  border: 0;
+  color: var(--ac-muted);
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+.ac-day-cell:hover { background: var(--ac-surface); }
+.ac-day-cell--blank { visibility: hidden; cursor: default; }
+.ac-day-cell--selected { background: var(--ac-selected-bg); color: var(--ac-selected-fg); font-weight: 600; }
+.ac-day-cell--today { background: var(--ac-accent-bg); color: var(--ac-accent); font-weight: 600; }
+.ac-day-dots {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 2px;
+  margin-top: 2px;
+}
+.ac-day-dot {
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--ac-fg);
+}
+.ac-day-cell--selected .ac-day-dot { background: rgb(255 255 255 / 0.6); }
+.ac-day-cell--today .ac-day-dot { background: var(--ac-accent); }
+.ac-selected-date {
+  margin-top: 0.75rem;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--ac-muted);
+}
+
+/* Timeline */
+.ac-timeline-title {
+  margin-bottom: 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ac-fg);
+}
+.ac-timeline-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px solid var(--ac-border-strong);
+  background: var(--ac-surface);
+  border-radius: var(--ac-radius-sm);
+  padding: 0.625rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--ac-muted);
+  margin: 0.5rem 0;
+  cursor: pointer;
+}
+.ac-timeline-toggle:hover { background: #e4e4e7; color: var(--ac-fg); }
+.ac-timeline-toggle-badge {
+  background: var(--ac-fg);
+  color: var(--ac-bg);
+  padding: 1px 6px;
+  border-radius: 9999px;
+  font-size: 10px;
+  font-weight: 600;
+}
+.ac-timeline-slot {
+  display: flex;
+  border-top: 1px solid #f4f4f5;
+}
+.ac-timeline-slot:first-child { border-top: 0; }
+.ac-hour-label {
+  position: relative;
+  width: 3.5rem;
+  flex-shrink: 0;
+  padding: 0.75rem 0.75rem 0 0;
+  text-align: right;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.75rem;
+  color: var(--ac-muted-2);
+}
+.ac-hour-label-now-dot {
+  position: absolute;
+  right: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--ac-accent);
+  transform: translateY(-50%);
+}
+.ac-timeline-body {
+  position: relative;
+  flex: 1;
+  height: var(--ac-slot-height);
+}
+.ac-now-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  border-top: 2px solid var(--ac-accent);
+  pointer-events: none;
+}
+.ac-empty-slot {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--ac-radius-sm);
+  background: none;
+  border: 0;
+  cursor: pointer;
+}
+.ac-empty-slot:hover { background: var(--ac-surface); }
+.ac-appointment-block {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  border-radius: var(--ac-radius-sm);
+  overflow: hidden;
+}
