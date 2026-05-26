@@ -14,15 +14,18 @@ export interface MonthCalendarProps {
   initialMonth?: number;
   /** BCP-47 locale used for Intl date formatting. Default "en-US". */
   locale?: string;
+  /** Fires after prev/next/today with the new visible (year, month). Not fired on mount. */
+  onMonthChange?: (year: number, month: number) => void;
   /** Static strings shown in the UI. */
   labels: Labels;
 }
 
 export function MonthCalendar(props: MonthCalendarProps) {
-  const { selected, onSelect, dayCounts = {}, locale = "en-US", labels } = props;
+  const { selected, onSelect, dayCounts = {}, locale = "en-US", labels, onMonthChange } = props;
   const { year, month, days, prev, next, goToday } = useMonthGrid({
     initialYear: props.initialYear,
     initialMonth: props.initialMonth,
+    onMonthChange,
   });
 
   const todayStr = useMemo(() => formatYMD(new Date()), []);

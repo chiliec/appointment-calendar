@@ -99,6 +99,7 @@ Class names are prefixed `.ac-` — see `src/styled/styles.css` for the full lis
 | `dayCounts` | `Record<string, number>` | no | Workload dots per day |
 | `initialYear` / `initialMonth` | `number` | no | Defaults to today; month is 0-indexed |
 | `locale` | `string` | no | BCP-47, default `"en-US"` |
+| `onMonthChange` | `(year, month) => void` | no | Fires after prev/next/today nav. Useful for refetching workload counts. Not fired on mount. |
 | `labels` | `Labels` | yes | See "Labels" below |
 
 ### `<DayTimeline<T> />`

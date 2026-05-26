@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { renderHook, act } from "@testing-library/react";
 import { useMonthGrid } from "../src/headless/useMonthGrid";
 
@@ -56,5 +56,33 @@ describe("useMonthGrid", () => {
     act(() => result.current.goToday());
     expect(result.current.year).toBe(now.getFullYear());
     expect(result.current.month).toBe(now.getMonth());
+  });
+
+  it("does not fire onMonthChange on mount", () => {
+    const onMonthChange = vi.fn();
+    renderHook(() => useMonthGrid({ initialYear: 2026, initialMonth: 4, onMonthChange }));
+    expect(onMonthChange).not.toHaveBeenCalled();
+  });
+
+  it("fires onMonthChange with new (year, month) on next/prev", () => {
+    const onMonthChange = vi.fn();
+    const { result } = renderHook(() =>
+      useMonthGrid({ initialYear: 2026, initialMonth: 11, onMonthChange }),
+    );
+    act(() => result.current.next());
+    expect(onMonthChange).toHaveBeenLastCalledWith(2027, 0);
+    act(() => result.current.prev());
+    expect(onMonthChange).toHaveBeenLastCalledWith(2026, 11);
+    expect(onMonthChange).toHaveBeenCalledTimes(2);
+  });
+
+  it("fires onMonthChange on goToday with today's (year, month)", () => {
+    const onMonthChange = vi.fn();
+    const now = new Date();
+    const { result } = renderHook(() =>
+      useMonthGrid({ initialYear: 2020, initialMonth: 0, onMonthChange }),
+    );
+    act(() => result.current.goToday());
+    expect(onMonthChange).toHaveBeenCalledWith(now.getFullYear(), now.getMonth());
   });
 });
