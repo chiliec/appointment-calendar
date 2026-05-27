@@ -50,12 +50,52 @@ describe("findConflicts", () => {
   });
 
   it("excludes the given id when provided (useful when editing)", () => {
-    const result = findConflicts("09:00", 60, existing, "a");
+    const result = findConflicts("09:00", 60, existing, { excludeId: "a" });
     expect(result).toEqual([]);
   });
 
-  it("does not count cleanup buffer — adjacent sessions are not conflicts", () => {
+  it("does not count cleanup buffer by default — adjacent sessions are not conflicts", () => {
     const result = findConflicts("10:00", 60, existing);
     expect(result.map((a) => a.id)).toEqual([]);
+  });
+});
+
+describe("findConflicts with a cleanup buffer", () => {
+  const existing: Appointment[] = [appt("a", "09:00", 60)];
+
+  it("blocks a slot that starts within the buffer after a session", () => {
+    // a runs 09:00–10:00; with 15m cleanup it is blocked until 10:15.
+    const result = findConflicts("10:00", 60, existing, { buffer: 15 });
+    expect(result.map((a) => a.id)).toEqual(["a"]);
+  });
+
+  it("allows a slot that starts exactly at the buffer end", () => {
+    const result = findConflicts("10:15", 60, existing, { buffer: 15 });
+    expect(result).toEqual([]);
+  });
+
+  it("blocks a slot whose trailing buffer reaches back into an existing session", () => {
+    // Proposed 08:00–09:00 + 15m cleanup blocks until 09:15, overlapping a's start.
+    const result = findConflicts("08:00", 60, existing, { buffer: 15 });
+    expect(result.map((a) => a.id)).toEqual(["a"]);
+  });
+
+  it("honors a per-appointment buffer via getBuffer", () => {
+    type Apt = Appointment & { skip_cleanup: boolean };
+    const appts: Apt[] = [
+      { id: "a", date: "2026-05-26", start_time: "09:00", duration: 60, skip_cleanup: true },
+      { id: "b", date: "2026-05-26", start_time: "11:00", duration: 60, skip_cleanup: false },
+    ];
+    const getBuffer = (apt: Apt) => (apt.skip_cleanup ? 0 : 15);
+
+    // a skips cleanup, so a 10:00 start right after it is fine.
+    expect(
+      findConflicts("10:00", 60, appts, { getBuffer }).map((x) => x.id),
+    ).toEqual([]);
+
+    // b keeps its 15m cleanup; b runs 11:00–12:00, blocked until 12:15.
+    expect(
+      findConflicts("12:00", 60, appts, { getBuffer }).map((x) => x.id),
+    ).toEqual(["b"]);
   });
 });

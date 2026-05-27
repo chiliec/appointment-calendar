@@ -3,36 +3,60 @@ import { timeToMinutes } from "./utils";
 
 /**
  * Check if two time ranges overlap.
- * `newSessionEnd` and `existingSessionEnd` are exclusive endpoints (touching = no overlap).
- * Cleanup time is buffer — not counted as conflict here. The caller passes session-only
- * endpoints.
+ * Endpoints are exclusive (touching = no overlap). Callers pass whatever end
+ * they want counted — session-only, or session + cleanup buffer.
  */
 export function hasConflict(
   newStart: number,
-  newSessionEnd: number,
+  newEnd: number,
   existingStart: number,
-  existingSessionEnd: number,
+  existingEnd: number,
 ): boolean {
-  return newStart < existingSessionEnd && existingStart < newSessionEnd;
+  return newStart < existingEnd && existingStart < newEnd;
+}
+
+export interface FindConflictsOptions<T extends Appointment> {
+  /** Skip this appointment by id (useful when editing an existing one). */
+  excludeId?: string;
+  /**
+   * Cleanup minutes reserved after a session before the next may start.
+   * Each session blocks `[start, start + duration + buffer)`; two appointments
+   * conflict when those blocked intervals overlap. Default `0` — cleanup is
+   * non-blocking and back-to-back bookings are allowed.
+   */
+  buffer?: number;
+  /**
+   * Per-appointment buffer for existing appointments; overrides `buffer` for
+   * each one. The proposed slot still uses the scalar `buffer` for its own
+   * trailing cleanup. Example: `(apt) => apt.skip_cleanup ? 0 : 15`.
+   */
+  getBuffer?: (apt: T) => number;
 }
 
 /**
- * Find conflicts between a proposed slot and existing appointments.
- * Pass `excludeId` to skip an appointment (useful when editing an existing one).
+ * Find existing appointments that conflict with a proposed slot.
+ *
+ * @param startTime  Proposed start ("HH:MM" or "HH:MM:SS").
+ * @param duration   Proposed session length in minutes.
+ * @param appointments  Existing appointments to check against.
+ * @param options    See {@link FindConflictsOptions}. Defaults reproduce
+ *                   session-only overlap (no cleanup buffer).
  */
 export function findConflicts<T extends Appointment>(
   startTime: string,
   duration: number,
   appointments: T[],
-  excludeId?: string,
+  options: FindConflictsOptions<T> = {},
 ): T[] {
+  const { excludeId, buffer = 0, getBuffer } = options;
   const newStart = timeToMinutes(startTime);
-  const newEnd = newStart + duration;
+  const newEnd = newStart + duration + buffer;
 
   return appointments.filter((apt) => {
     if (excludeId && apt.id === excludeId) return false;
     const aptStart = timeToMinutes(apt.start_time);
-    const aptEnd = aptStart + apt.duration;
+    const aptBuffer = getBuffer ? getBuffer(apt) : buffer;
+    const aptEnd = aptStart + apt.duration + aptBuffer;
     return hasConflict(newStart, newEnd, aptStart, aptEnd);
   });
 }

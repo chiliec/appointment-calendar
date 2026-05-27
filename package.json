@@ -1,6 +1,6 @@
 {
   "name": "@chiliec/appointment-calendar",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Month-grid calendar + daily timeline React components for appointment booking UIs",
   "type": "module",
   "license": "MIT",

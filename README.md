@@ -114,6 +114,28 @@ Class names are prefixed `.ac-` — see `src/styled/styles.css` for the full lis
 | `getDisplayDuration` | `(apt: T) => number` | no | For cleanup buffer, etc. |
 | `labels` | `Labels` | yes | |
 
+### `findConflicts(startTime, duration, appointments, options?)`
+
+Returns the existing appointments that overlap a proposed slot.
+
+```ts
+findConflicts("09:30", 60, appointments); // session-only overlap
+```
+
+| Option | Type | Default | Notes |
+|---|---|---|---|
+| `excludeId` | `string` | — | Skip this appointment by id (useful when editing) |
+| `buffer` | `number` | `0` | Cleanup minutes reserved after each session. `0` keeps cleanup non-blocking, so back-to-back bookings are allowed |
+| `getBuffer` | `(apt: T) => number` | — | Per-appointment buffer for existing appointments; overrides `buffer` for each. The proposed slot still uses the scalar `buffer` for its own trailing cleanup |
+
+```ts
+// Enforce a 15-minute gap, except where an appointment opts out of cleanup:
+findConflicts("10:00", 60, appointments, {
+  buffer: 15,
+  getBuffer: (apt) => (apt.skip_cleanup ? 0 : 15),
+});
+```
+
 ### `Labels`
 
 ```ts
