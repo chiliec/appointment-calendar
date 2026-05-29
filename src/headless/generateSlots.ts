@@ -36,8 +36,9 @@ export interface Slot {
  * Generate the bookable start-time grid for a single day.
  *
  * Candidate starts run from `workStart` by `step` minutes while the session
- * ends by `workEnd` (`start + duration <= workEnd`); the trailing `buffer` may
- * spill past close. Each candidate's availability is computed with
+ * ends by `workEnd` (start-minutes + `duration` must not exceed `workEnd × 60`);
+ * the trailing `buffer` may spill past close. Each candidate's availability is
+ * computed with
  * {@link findConflicts}, so overlap/buffer semantics are identical to it.
  */
 export function generateSlots<T extends Appointment>(
