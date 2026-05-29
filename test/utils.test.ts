@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { formatYMD, buildMonthGrid, timeToMinutes } from "../src/headless/utils";
+import { formatYMD, buildMonthGrid, timeToMinutes, minutesToTime } from "../src/headless/utils";
 
 describe("formatYMD", () => {
   it("formats a date as YYYY-MM-DD", () => {
@@ -58,6 +58,19 @@ describe("buildMonthGrid length", () => {
     expect(buildMonthGrid(2023, 9)).toHaveLength(42); // Oct 2023, 31 days
     expect(buildMonthGrid(2026, 4)).toHaveLength(42); // May 2026
     expect(buildMonthGrid(2026, 11)).toHaveLength(42); // Dec 2026
+  });
+});
+
+describe("minutesToTime", () => {
+  it("formats minutes since midnight as zero-padded HH:MM", () => {
+    expect(minutesToTime(0)).toBe("00:00");
+    expect(minutesToTime(540)).toBe("09:00");
+    expect(minutesToTime(575)).toBe("09:35");
+    expect(minutesToTime(1260)).toBe("21:00");
+  });
+
+  it("round-trips with timeToMinutes", () => {
+    expect(minutesToTime(timeToMinutes("13:45"))).toBe("13:45");
   });
 });
 
