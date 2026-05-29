@@ -136,6 +136,40 @@ findConflicts("10:00", 60, appointments, {
 });
 ```
 
+### `generateSlots(options)`
+
+Generate the bookable start-time grid for a single day. Candidate starts run
+from `workStart` by `step` minutes while the session ends by `workEnd`; the
+trailing `buffer` may spill past close. Availability is computed with
+`findConflicts`, so buffer semantics match exactly.
+
+```ts
+// One procedure, fixed 15-min cleanup
+generateSlots({ date, appointments, duration: 60, step: 30, buffer: 15 });
+
+// Procedure carries its own duration + break (may be 0)
+generateSlots({
+  date, appointments,
+  duration: selected.duration,
+  step: 15,
+  buffer: selected.break,
+  getBuffer: (apt) => apt.break ?? 0,
+});
+```
+
+Returns `Slot[]` — every candidate, in order: `{ time: "HH:MM"; available: boolean; conflictIds: string[] }`.
+
+| Option | Type | Default | Notes |
+|---|---|---|---|
+| `date` | `string` (YYYY-MM-DD) | — | Day to generate for; `appointments` are filtered to it |
+| `appointments` | `T[]` | — | Existing appointments (any date; filtered internally) |
+| `duration` | `number` | — | Session length being booked, minutes |
+| `step` | `number` | — | Minutes between candidate starts |
+| `workStart` / `workEnd` | `number` | `9` / `21` | Opening/closing hour |
+| `buffer` | `number` | `0` | Trailing cleanup for the booked slot |
+| `getBuffer` | `(apt: T) => number` | — | Per-appointment buffer for existing appointments |
+| `excludeId` | `string` | — | Skip this appointment — for rescheduling |
+
 ### `Labels`
 
 ```ts
